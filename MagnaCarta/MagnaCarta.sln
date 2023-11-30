@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublicFrontEnd", "PublicFrontEnd\PublicFrontEnd.csproj", "{8C2FEE67-8370-4507-A0DD-668CE4C12A6F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedDomain", "SharedDomain\SharedDomain.csproj", "{D9CF9214-9B3C-46BA-9ABA-F1CA5C54488A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivateFrontEnd", "PrivateFrontEnd\PrivateFrontEnd.csproj", "{41444023-D643-4463-B572-52BEC6189FD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{8C2FEE67-8370-4507-A0DD-668CE4C12A6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C2FEE67-8370-4507-A0DD-668CE4C12A6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C2FEE67-8370-4507-A0DD-668CE4C12A6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9CF9214-9B3C-46BA-9ABA-F1CA5C54488A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9CF9214-9B3C-46BA-9ABA-F1CA5C54488A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9CF9214-9B3C-46BA-9ABA-F1CA5C54488A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9CF9214-9B3C-46BA-9ABA-F1CA5C54488A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41444023-D643-4463-B572-52BEC6189FD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41444023-D643-4463-B572-52BEC6189FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41444023-D643-4463-B572-52BEC6189FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41444023-D643-4463-B572-52BEC6189FD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
