@@ -5,7 +5,7 @@
 
 <PageTitle>Weather forecast</PageTitle>
 
-@inject ProductsService ProductsService
+@inject IProductsService ProductsService
 
 <h1>Menú</h1>
 
@@ -35,7 +35,7 @@ else
 }
 
 @code {
-    private Product[]? products;
+    private IReadOnlyCollection<Product>? products;
 
     protected override async Task OnInitializedAsync()
     {
