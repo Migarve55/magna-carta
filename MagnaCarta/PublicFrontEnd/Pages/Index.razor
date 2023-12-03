@@ -1,6 +1,45 @@
 ﻿@page "/"
+@using SharedDomain.Services
+@using SharedDomain.Entities
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Mesas</PageTitle>
 
-<h1>MagnaCarta</h1>
-<h2>Welcome to service industry revolution</h2>
+@inject ITablesService TablesService
+
+<h1>Mesas</h1>
+
+@if (_tables == null)
+{
+    <p>
+        <em>Cargando...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var table in _tables)
+        {
+            <tr>
+                <td>
+                    <a href="/tables/@table.Id">@table.Name</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyCollection<Table>? _tables;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tables = await TablesService.GetAllTables();
+    }
+}

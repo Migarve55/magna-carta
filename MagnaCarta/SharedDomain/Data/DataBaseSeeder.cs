@@ -57,7 +57,7 @@ public class DataBaseSeeder
 
     private async Task SeedUser(string email, string password, params string[] roles)
     {
-        bool userExists = _userManager.FindByEmailAsync(email) != null;
+        bool userExists = await _userManager.FindByEmailAsync(email) != null;
         if (!userExists)
         {
             var user = new IdentityUser()

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SharedDomain.Data;
 using SharedDomain.Entities;
 using SharedDomain.Repositories;
 using SharedDomain.Services;
@@ -10,8 +9,6 @@ public static class ServicesExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<DataBaseSeeder>();
-        
         // Services
         services.AddScoped<IProductsService, ProductsService>();
         services.AddScoped<ITablesService, TablesService>();

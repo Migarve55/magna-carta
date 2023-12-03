@@ -1,0 +1,58 @@
+﻿@page "/tables/{TableId:int}"
+@using SharedDomain.Data
+@using SharedDomain.Entities
+@using SharedDomain.Services
+
+<PageTitle>Menu</PageTitle>
+
+@inject ITablesService TablesService
+@inject IProductsService ProductsService
+@inject NavigationManager NavigationManager
+
+<h1>Menú</h1>
+
+@if (_products == null && _table == null)
+{
+    <p>
+        <em>Cargando...</em>
+    </p>
+}
+else
+{
+    <h3>@_table.Name</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var product in _products)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Price</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int TableId { get; set; }
+    
+    private Table? _table;
+    private IReadOnlyCollection<Product>? _products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _table = await TablesService.GetTable(TableId);
+        if (_table == null)
+        {
+            NavigationManager.NavigateTo("~/");
+        }
+        _products = await ProductsService.GetAllProducts();
+    }
+}

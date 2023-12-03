@@ -11,7 +11,7 @@ public static class AppExtensions
     {
         using var scope = app.Services.CreateScope();
         DataBaseSeeder seeder = scope.ServiceProvider.GetRequiredService<DataBaseSeeder>();
-        seeder.SeedDatabase();
+        seeder.SeedDatabase().Wait();
         return app;
     }
 }

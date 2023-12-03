@@ -23,6 +23,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services
     .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddServices();
+builder.Services.AddScoped<DataBaseSeeder>();
 
 var app = builder.Build();
 
