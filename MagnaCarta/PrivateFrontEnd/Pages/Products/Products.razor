@@ -9,6 +9,8 @@
 
 <h1>Gestión de productos</h1>
 
+<a class="btn btn-primary" href="Products/New">Crear</a>
+
 @if (_products == null)
 {
     <p>
@@ -21,6 +23,8 @@ else
         <thead>
         <tr>
             <th>Nombre</th>
+            <th>Precio</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -28,6 +32,11 @@ else
         {
             <tr>
                 <td>@product.Name</td>
+                <td>@product.Price</td>
+                <td>
+                    <a class="btn btn-primary" href="/Products/@product.Id">Editar</a>
+                    <button class="btn btn-danger" onclick=@(() => Delete(@product.Id))>Borrar</button>
+                </td>
             </tr>
         }
         </tbody>
@@ -39,6 +48,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadData();
+    }
+    
+    private async Task Delete(int id)
+    {
+        await ProductsService.DeleteProduct(id);
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
         _products = await ProductsService.GetAllProducts();
+        StateHasChanged();
     }
 }

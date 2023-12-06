@@ -12,5 +12,6 @@ public class Product
     public string Name { get; set; }
     
     [Required]
+    [Range(0, Double.PositiveInfinity)]
     public decimal Price { get; set; }
 }
