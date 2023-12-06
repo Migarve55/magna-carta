@@ -24,6 +24,7 @@ builder.Services
     .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddServices();
 builder.Services.AddScoped<DataBaseSeeder>();
+builder.Services.AddLocalization();
 
 var app = builder.Build();
 
