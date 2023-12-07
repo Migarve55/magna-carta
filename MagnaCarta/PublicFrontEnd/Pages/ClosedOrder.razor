@@ -1,0 +1,56 @@
+﻿@page "/Orders/{OrderId:int}/Closed"
+@using SharedDomain.Entities
+@using SharedDomain.Services
+
+<PageTitle>Pedido</PageTitle>
+
+@inject IOrdersService OrdersService
+
+<h1>Resumen del pedido</h1>
+
+@if (_order == null)
+{
+    <p>
+        <em>Cargando...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var orderDetail in _order!.OrderDetails)
+        {
+            <tr>
+                <td>@orderDetail.Product.Name</td>
+                <td>@orderDetail.Product.Price</td>
+                <td>@orderDetail.Quantity</td>
+                <td>@orderDetail.Total</td>
+            </tr>
+        }
+        <tr>
+            <td colspan="3"></td>
+            <td>@_order.Total</td>
+        </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+
+    private Order? _order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _order = await OrdersService.GetOrder(OrderId);
+    }
+}

@@ -5,8 +5,12 @@ namespace SharedDomain.Services;
 public interface IOrdersService
 {
     Task<Order?> GetOrder(int id);
-    Task<IReadOnlyCollection<Order>> GetAllOrders();
-    Task<Order> AddOrder(Order order);
-    Task UpdateOrder(Order order);
-    Task DeleteOrder(int id);
+    Task<Order> GetOrCreateOrderForTable(Table table);
+    Task<IReadOnlyCollection<Order>> GetActiveOrdersOrderedByDate();
+    Task<Order> AddProductToTableOrder(Table table, Product product);
+    Task<Order> RemoveProductFromTableOrder(Table table, Product product);
+    Task ConfirmOrder(Order order);
+    Task CloseOrder(Order order);
+    Task MarkAsReady(OrderDetail detail);
+    Task MarkAsDelivered(OrderDetail detail);
 }

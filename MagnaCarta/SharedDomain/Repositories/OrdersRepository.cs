@@ -29,12 +29,20 @@ public class OrdersRepository : IRepository<Order>
 
     public async Task<IReadOnlyCollection<Order>> GetAllAsync()
     {
-        return await _dbContext.Orders.ToArrayAsync();
+        return await _dbContext.Orders
+            .Include(o => o.Table)
+            .Include(o => o.OrderDetails)
+            .Include("OrderDetails.Product")
+            .ToArrayAsync();
     }
 
     public async Task<Order?> GetByIdAsync(int id)
     {
-        return await _dbContext.Orders.SingleOrDefaultAsync(p => p.Id == id);
+        return await _dbContext.Orders
+            .Include(o => o.Table)
+            .Include(o => o.OrderDetails)
+            .Include("OrderDetails.Product")
+            .SingleOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task DeleteAsync(int id)

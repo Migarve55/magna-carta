@@ -7,11 +7,13 @@
 
 @inject ITablesService TablesService
 @inject IProductsService ProductsService
+@inject IOrdersService OrdersService
 @inject NavigationManager NavigationManager
 
 <h1>Menú</h1>
+<button @onclick="ConfirmOrder">Confirmar</button>
 
-@if (_products == null && _table == null)
+@if (_products == null && _table == null && _order == null)
 {
     <p>
         <em>Cargando...</em>
@@ -23,16 +25,39 @@ else
     <table class="table">
         <thead>
         <tr>
-            <th>Name</th>
-            <th>Price</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var product in _products)
+        @foreach (var product in _products!)
         {
             <tr>
                 <td>@product.Name</td>
                 <td>@product.Price</td>
+                <td>
+                    <button class="btn btn-primary" onclick=@(() => AddToOrder(@product))>Pedir</button>
+                    <button class="btn btn-danger" onclick=@(() => RemoveFromOrder(@product))>Quitar</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <h3>Pedido</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var orderDetail in _order!.OrderDetails)
+        {
+            <tr>
+                <td>@orderDetail.Product.Name</td>
+                <td>@orderDetail.Quantity</td>
             </tr>
         }
         </tbody>
@@ -44,6 +69,7 @@ else
     public int TableId { get; set; }
     
     private Table? _table;
+    private Order? _order;
     private IReadOnlyCollection<Product>? _products;
 
     protected override async Task OnInitializedAsync()
@@ -54,5 +80,24 @@ else
             NavigationManager.NavigateTo("~/");
         }
         _products = await ProductsService.GetAllProducts();
+        _order = await OrdersService.GetOrCreateOrderForTable(_table!);
+    }
+
+    private async Task AddToOrder(Product product)
+    {
+        _order = await OrdersService.AddProductToTableOrder(_table!, product);
+        StateHasChanged();
+    }
+    
+    private async Task RemoveFromOrder(Product product)
+    {
+        _order = await OrdersService.RemoveProductFromTableOrder(_table!, product);
+        StateHasChanged();
+    }
+    
+    private async Task ConfirmOrder()
+    {
+        await OrdersService.ConfirmOrder(_order!);
+        NavigationManager.NavigateTo($"Orders/{_order!.Id}");
     }
 }

@@ -1,0 +1,60 @@
+﻿@page "/Orders/{OrderId:int}"
+@using SharedDomain.Entities
+@using SharedDomain.Services
+<PageTitle>Detalle del pedido</PageTitle>
+@inject IOrdersService OrdersService
+<h1>Detalle del pedido</h1>
+
+@if (_order == null)
+{
+    <p>
+        <em>Cargando...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var orderDetail in _order!.OrderDetails)
+        {
+            <tr>
+                <td>@orderDetail.Product.Name</td>
+                <td>@orderDetail.Quantity</td>
+                <td>
+                    @(orderDetail.Status switch
+                    {
+                        OrderDetailStatus.Created => (@<span>Creado</span>),
+                        OrderDetailStatus.Confirmed => (@<span>Confirmado</span>),
+                        OrderDetailStatus.Ready => (@<span>Preparado</span>),
+                        OrderDetailStatus.Delivered => (@<span>Entregado</span>)})
+                </td>
+                <td>@orderDetail.Total</td>
+            </tr>
+        }
+        <tr>
+            <td colspan="3"></td>
+            <td>@_order.Total</td>
+        </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+    
+    private Order? _order { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _order = await OrdersService.GetOrder(OrderId);
+    }
+}

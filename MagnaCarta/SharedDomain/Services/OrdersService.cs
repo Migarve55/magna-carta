@@ -1,4 +1,5 @@
-﻿using SharedDomain.Entities;
+﻿using System.Linq;
+using SharedDomain.Entities;
 using SharedDomain.Repositories;
 
 namespace SharedDomain.Services;
@@ -17,23 +18,65 @@ internal class OrdersService : IOrdersService
         return await _repository.GetByIdAsync(id);
     }
 
-    public async Task<IReadOnlyCollection<Order>> GetAllOrders()
+    public async Task<Order> GetOrCreateOrderForTable(Table table)
     {
-        return await _repository.GetAllAsync();
+        var orders = await _repository.GetAllAsync();
+        var order = orders.FirstOrDefault(o => o.TableId == table.Id && o.IsActive());
+        if (order == null)
+        {
+            order = new Order(table);
+            await _repository.CreateAsync(order);
+        }
+
+        return order;
     }
 
-    public async Task<Order> AddOrder(Order order)
+    public async Task<IReadOnlyCollection<Order>> GetActiveOrdersOrderedByDate()
     {
-        return await _repository.CreateAsync(order);
+        var orders = await _repository.GetAllAsync();
+        return orders
+            .Where(o => o.IsActive())
+            .OrderByDescending(o => o.Date)
+            .ToList();
     }
 
-    public async Task UpdateOrder(Order order)
+    public async Task<Order> AddProductToTableOrder(Table table, Product product)
     {
+        var order = await GetOrCreateOrderForTable(table);
+        order.AddProduct(product);
+        await _repository.UpdateAsync(order);
+        return order;
+    }
+    
+    public async Task<Order> RemoveProductFromTableOrder(Table table, Product product)
+    {
+        var order = await GetOrCreateOrderForTable(table);
+        order.RemoveProduct(product);
+        await _repository.UpdateAsync(order);
+        return order;
+    }
+
+    public async Task ConfirmOrder(Order order)
+    {
+        order.ConfirmOrder();
         await _repository.UpdateAsync(order);
     }
 
-    public async Task DeleteOrder(int id)
+    public async Task CloseOrder(Order order)
     {
-        await _repository.DeleteAsync(id);
+        order.CloseOrder();
+        await _repository.UpdateAsync(order);
+    }
+
+    public async Task MarkAsReady(OrderDetail detail)
+    {
+        detail.MarkDetailAsReady();
+        await _repository.UpdateAsync(detail.Order);
+    }
+
+    public async Task MarkAsDelivered(OrderDetail detail)
+    {
+        detail.MarkDetailAsDelivered();
+        await _repository.UpdateAsync(detail.Order);
     }
 }

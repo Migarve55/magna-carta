@@ -1,0 +1,66 @@
+﻿@page "/Orders/{OrderId:int}"
+@using SharedDomain.Entities
+@using SharedDomain.Services
+
+<PageTitle>Pedido</PageTitle>
+
+@inject IOrdersService OrdersService
+@inject NavigationManager NavigationManager
+
+<h1>Pedido en curso</h1>
+
+<button @onclick="CloseOrder">Finalizar</button>
+
+@if (_order == null)
+{
+    <p>
+        <em>Cargando...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var orderDetail in _order!.OrderDetails)
+        {
+            <tr>
+                <td>@orderDetail.Product.Name</td>
+                <td>@orderDetail.Quantity</td>
+                <td>
+                    @(orderDetail.Status switch
+                    {
+                        OrderDetailStatus.Created => (@<span>Creado</span>),
+                        OrderDetailStatus.Confirmed => (@<span>Confirmado</span>),
+                        OrderDetailStatus.Ready => (@<span>Preparado</span>),
+                        OrderDetailStatus.Delivered => (@<span>Entregado</span>)})
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+    
+    private Order? _order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _order = await OrdersService.GetOrder(OrderId);
+    }
+
+    private async Task CloseOrder()
+    {
+        await OrdersService.CloseOrder(_order!);
+        NavigationManager.NavigateTo($"Orders/{_order!.Id}/Closed");
+    }
+}

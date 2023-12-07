@@ -34,7 +34,9 @@ public class TablesRepository : IRepository<Table>
 
     public async Task<Table?> GetByIdAsync(int id)
     {
-        return await _dbContext.Tables.SingleOrDefaultAsync(p => p.Id == id);
+        return await _dbContext.Tables
+            .Include(t => t.Orders)
+            .SingleOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task DeleteAsync(int id)
