@@ -1,0 +1,48 @@
+﻿@using SharedDomain.Entities
+@using SharedDomain.Services
+@inject IOrdersService OrdersService
+
+@if (_orders == null)
+{
+    <p>
+        <em>Cargando...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Mesa</th>
+            <th>Fecha</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var order in _orders)
+        {
+            <tr>
+                <td>@order.Table.Name</td>
+                <td>@order.Date</td>
+                <td>
+                    <a class="btn btn-primary" href="/Orders/@order.Id">Ver detalle</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyCollection<Order>? _orders;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _orders = await OrdersService.GetActiveOrdersOrderedByDate();
+        StateHasChanged();
+    }
+}

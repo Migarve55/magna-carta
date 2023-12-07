@@ -3,7 +3,8 @@
 @using SharedDomain.Services
 <PageTitle>Detalle del pedido</PageTitle>
 @inject IOrdersService OrdersService
-<h1>Detalle del pedido</h1>
+<h1 class="mt-4">Detalle del pedido</h1>
+<a href="Orders" class="btn btn-primary">Volver</a>
 
 @if (_order == null)
 {

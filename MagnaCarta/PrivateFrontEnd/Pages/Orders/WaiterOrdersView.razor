@@ -1,0 +1,54 @@
+﻿@using SharedDomain.Entities
+@using SharedDomain.Services
+@inject IOrdersService OrdersService
+
+@if (_orders == null)
+{
+    <p>
+        <em>Cargando...</em>
+    </p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var order in _orders)
+        {
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">@order.Table.Name</div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var detail in @order.ReadyDetails)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <span>@detail.Product.Name (@detail.Quantity)</span>
+                                    <button class="btn btn-primary" @onclick="@(() => MarkAsDelivered(detail))">Entregar</button>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div> 
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private IReadOnlyCollection<Order>? _orders;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _orders = await OrdersService.GetOrdersWithReadyDetails();
+        StateHasChanged();
+    }
+
+    private async Task MarkAsDelivered(SharedDomain.Entities.OrderDetail detail)
+    {
+        await OrdersService.MarkAsDelivered(detail);
+        await LoadData();
+    }
+}
