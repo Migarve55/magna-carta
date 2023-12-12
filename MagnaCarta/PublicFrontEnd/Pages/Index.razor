@@ -6,7 +6,7 @@
 
 @inject ITablesService TablesService
 
-<h1>Mesas</h1>
+<h2>Mesas</h2>
 
 @if (_tables == null)
 {
@@ -16,23 +16,12 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Name</th>
-        </tr>
-        </thead>
-        <tbody>
+    <div class="list-group">
         @foreach (var table in _tables)
         {
-            <tr>
-                <td>
-                    <a href="/tables/@table.Id">@table.Name</a>
-                </td>
-            </tr>
+            <a href="/Tables/@table.Id" class="list-group-item list-group-item-action">@table.Name</a>
         }
-        </tbody>
-    </table>
+    </div>
 }
 
 @code {

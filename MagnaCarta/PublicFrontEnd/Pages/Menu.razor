@@ -10,10 +10,7 @@
 @inject IOrdersService OrdersService
 @inject NavigationManager NavigationManager
 
-<h1>Menú</h1>
-<button @onclick="ConfirmOrder">Confirmar</button>
-
-@if (_products == null && _table == null && _order == null)
+@if (_cart == null)
 {
     <p>
         <em>Cargando...</em>
@@ -21,47 +18,25 @@
 }
 else
 {
-    <h3>@_table.Name</h3>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Precio</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var product in _products!)
-        {
-            <tr>
-                <td>@product.Name</td>
-                <td>@product.Price</td>
-                <td>
-                    <button class="btn btn-primary" onclick=@(() => AddToOrder(@product))>Pedir</button>
-                    <button class="btn btn-danger" onclick=@(() => RemoveFromOrder(@product))>Quitar</button>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-    <h3>Pedido</h3>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Cantidad</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var orderDetail in _order!.OrderDetails)
-        {
-            <tr>
-                <td>@orderDetail.Product.Name</td>
-                <td>@orderDetail.Quantity</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <h2>Menú - @_order?.Table.Name</h2>
+    <button class="btn btn-primary mb-3" @onclick="ConfirmOrder">Confirmar pedido</button>
+    @foreach (var cartItem in _cart!)
+    {
+        <div class="card shadow-sm mb-2">
+            <div class="card-body">
+                <h5 class="card-title">@cartItem.Product.Name (@cartItem.Quantity)</h5>
+                <p class="card-text">Lore Ipsum</p>
+                <div class="text-end">
+                    <button class="btn btn-primary" onclick=@(() => AddToOrder(@cartItem.Product))>
+                        <span class="oi oi-plus"></span>
+                    </button>
+                    <button class="btn btn-danger" disabled="@(cartItem.Quantity <= 0)" onclick=@(() => RemoveFromOrder(@cartItem.Product))>
+                        <span class="oi oi-minus"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -71,6 +46,7 @@ else
     private Table? _table;
     private Order? _order;
     private IReadOnlyCollection<Product>? _products;
+    private IList<CartItem>? _cart;
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,23 +57,50 @@ else
         }
         _products = await ProductsService.GetAllProducts();
         _order = await OrdersService.GetOrCreateOrderForTable(_table!);
+        if (_order.Status == OrderStatus.Confirmed)
+        {
+            NavigationManager.NavigateTo($"Orders/{_order!.Id}");
+        }
+        CreateCart();
+    }
+
+    private void CreateCart()
+    {
+        _cart = _products!
+            .Select(p => new CartItem() { Product = p })
+            .ToList();
+        _order!.OrderDetails?.ForEach(od =>
+        {
+            var cartItem = _cart.FirstOrDefault(c => c.Product.Id == od.Product.Id);
+            if (cartItem != null)
+            {
+                cartItem.Quantity = od.Quantity;
+            }
+        });
+        StateHasChanged();
     }
 
     private async Task AddToOrder(Product product)
     {
         _order = await OrdersService.AddProductToTableOrder(_table!, product);
-        StateHasChanged();
+        CreateCart();
     }
     
     private async Task RemoveFromOrder(Product product)
     {
         _order = await OrdersService.RemoveProductFromTableOrder(_table!, product);
-        StateHasChanged();
+        CreateCart();;
     }
     
     private async Task ConfirmOrder()
     {
         await OrdersService.ConfirmOrder(_order!);
         NavigationManager.NavigateTo($"Orders/{_order!.Id}");
+    }
+
+    class CartItem
+    {
+        public Product Product { get; set; }
+        public int Quantity { get; set; }
     }
 }
