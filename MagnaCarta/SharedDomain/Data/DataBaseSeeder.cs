@@ -114,7 +114,9 @@ public class DataBaseSeeder
         Product product = new Product
         {
             Name = name,
-            Price = price
+            Price = price,
+            Description = "",
+            Type = ProductType.Normal
         };
         await _productsService.AddProduct(product);
     }

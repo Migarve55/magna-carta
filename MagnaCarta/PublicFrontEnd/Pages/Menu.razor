@@ -24,8 +24,12 @@ else
     {
         <div class="card shadow-sm mb-2">
             <div class="card-body">
-                <h5 class="card-title">@cartItem.Product.Name (@cartItem.Quantity)</h5>
-                <p class="card-text">Lore Ipsum</p>
+                <h5 class="card-title">
+                    <span class="me-2">@cartItem.Product.Name (@cartItem.Quantity)</span>
+                    <span class="badge bg-success" hidden="@(!cartItem.Product.IsVegetarian)">Vegetariano</span>
+                    <span class="badge bg-success" hidden="@(!cartItem.Product.IsVegan)">Vegano</span>
+                </h5>
+                <p class="card-text text-secondary">@cartItem.Product.Description</p>
                 <div class="text-end">
                     <button class="btn btn-primary" onclick=@(() => AddToOrder(@cartItem.Product))>
                         <span class="oi oi-plus"></span>

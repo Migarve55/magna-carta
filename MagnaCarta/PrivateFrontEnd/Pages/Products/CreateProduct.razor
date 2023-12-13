@@ -18,6 +18,24 @@
         <ValidationMessage For="@(() => Model!.Name)" />
     </div>
     <div class="form-group row">
+        <label class="control-label col-md-12">Descripción</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="Model.Description" />
+        </div>
+        <ValidationMessage For="@(() => Model!.Description)" />
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-md-12">Tipo</label>
+        <div class="col-md-4">
+            <InputSelect class="form-select" @bind-Value="Model.Type">
+                <option value="@(ProductType.Normal)">Normal</option>
+                <option value="@(ProductType.Vegetarian)">Vegetariano</option>
+                <option value="@(ProductType.Vegan)">Vegano</option>
+            </InputSelect>
+        </div>
+        <ValidationMessage For="@(() => Model!.Type)" />
+    </div>
+    <div class="form-group row">
         <label class="control-label col-md-12">Precio</label>
         <div class="col-md-4">
             <InputNumber class="form-control" @bind-Value="Model.Price" />
