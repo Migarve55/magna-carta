@@ -7,9 +7,9 @@ public class Table
     [Key]
     public int Id { get; set; }
     
-    [Required]
-    [MaxLength(500)]
+    [Required(ErrorMessage = "El nombre es obligatorio")]
+    [MaxLength(500, ErrorMessage = "La longuitud máxima es 500 caracteres")]
     public string Name { get; set; }
-    
-    public virtual List<Order> Orders { get; set; }
+
+    public virtual List<Order> Orders { get; set; } = new();
 }

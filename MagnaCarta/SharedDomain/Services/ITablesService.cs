@@ -8,5 +8,5 @@ public interface ITablesService
     Task<IReadOnlyCollection<Table>> GetAllTables();
     Task<Table> AddTable(Table table);
     Task UpdateTable(Table table);
-    Task DeleteTable(int id);
+    Task<DeleteEntityResult> DeleteTable(int id);
 }

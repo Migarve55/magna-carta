@@ -8,5 +8,5 @@ public interface IProductsService
     Task<IReadOnlyCollection<Product>> GetAllProducts();
     Task<Product> AddProduct(Product product);
     Task UpdateProduct(Product product);
-    Task DeleteProduct(int id);
+    Task<DeleteEntityResult> DeleteProduct(int id);
 }

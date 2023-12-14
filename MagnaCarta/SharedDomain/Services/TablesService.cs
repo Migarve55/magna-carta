@@ -32,8 +32,20 @@ internal class TablesService : ITablesService
         await _repository.UpdateAsync(table);
     }
 
-    public async Task DeleteTable(int id)
+    public async Task<DeleteEntityResult> DeleteTable(int id)
     {
+        Table? table = await _repository.GetByIdAsync(id);
+        if (table == null)
+        {
+            return DeleteEntityResult.Fail($"La mesa con id({id}) no existe");
+        }
+
+        if (table.Orders.Any())
+        {
+            return DeleteEntityResult.Fail("La mesa ya está asociada a un pedido");
+        }
+        
         await _repository.DeleteAsync(id);
+        return DeleteEntityResult.Success();
     }
 }

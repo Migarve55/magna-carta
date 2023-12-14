@@ -5,35 +5,51 @@ namespace SharedDomain.Services;
 
 internal class ProductsService : IProductsService
 {
-    private readonly IRepository<Product> _repository;
+    private readonly IRepository<Product> _productRepository;
+    private readonly IRepository<OrderDetail> _orderDetailsRepository;
 
-    public ProductsService(IRepository<Product> repository)
+    public ProductsService(IRepository<Product> productRepository, 
+        IRepository<OrderDetail> orderDetailsRepository)
     {
-        _repository = repository;
+        _productRepository = productRepository;
+        _orderDetailsRepository = orderDetailsRepository;
     }
 
     public async Task<Product?> GetProduct(int id)
     {
-        return await _repository.GetByIdAsync(id);
+        return await _productRepository.GetByIdAsync(id);
     }
 
     public async Task<IReadOnlyCollection<Product>> GetAllProducts()
     {
-        return await _repository.GetAllAsync();
+        return await _productRepository.GetAllAsync();
     }
 
     public async Task<Product> AddProduct(Product product)
     {
-        return await _repository.CreateAsync(product);
+        return await _productRepository.CreateAsync(product);
     }
 
     public async Task UpdateProduct(Product product)
     {
-        await _repository.UpdateAsync(product);
+        await _productRepository.UpdateAsync(product);
     }
 
-    public async Task DeleteProduct(int id)
+    public async Task<DeleteEntityResult> DeleteProduct(int id)
     {
-        await _repository.DeleteAsync(id);
+        Product? product = await _productRepository.GetByIdAsync(id);
+        if (product == null)
+        {
+            return DeleteEntityResult.Fail($"El producto con id({id}) no existe");
+        }
+
+        IReadOnlyCollection<OrderDetail> orderDetails = await _orderDetailsRepository.GetAllAsync();
+        if (orderDetails.Any(od => od.ProductId == product.Id))
+        {
+            return DeleteEntityResult.Fail($"El producto con ya está siendo usado en un pedido");
+        }
+        
+        await _productRepository.DeleteAsync(id);
+        return DeleteEntityResult.Success();
     }
 }

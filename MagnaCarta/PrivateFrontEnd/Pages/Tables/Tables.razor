@@ -18,6 +18,7 @@
 }
 else
 {
+    <div hidden="@(_errorMsg == null)" class="alert alert-danger mt-2">@_errorMsg</div>
     <table class="table">
         <thead>
         <tr>
@@ -42,6 +43,7 @@ else
 
 @code {
     private IReadOnlyCollection<Table>? _tables;
+    private string? _errorMsg;
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,8 +52,16 @@ else
     
     private async Task Delete(int id)
     {
-        await TablesService.DeleteTable(id);
-        await LoadData();
+        var result = await TablesService.DeleteTable(id);
+        if (result.IsSuccess)
+        {
+            await LoadData();
+        }
+        else
+        {
+            _errorMsg = result.Error;
+            StateHasChanged();
+        }
     }
 
     private async Task LoadData()

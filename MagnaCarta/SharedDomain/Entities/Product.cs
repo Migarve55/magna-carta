@@ -8,19 +8,19 @@ public class Product
     [Key]
     public int Id { get; set; }
     
-    [Required]
-    [MaxLength(500)]
+    [Required(ErrorMessage = "El nombre es obligatorio")]
+    [MaxLength(500, ErrorMessage = "La longuitud máxima es 500 caracteres")]
     public string Name { get; set; }
     
-    [Required]
-    [MaxLength(2000)]
+    [Required(ErrorMessage = "La descripción es obligatoria")]
+    [MaxLength(2000, ErrorMessage = "La longuitud máxima es 2000 caracteres")]
     public string Description { get; set; }
     
     [Required]
     public ProductType Type { get; set; }
     
     [Required]
-    [Range(0, Double.PositiveInfinity)]
+    [Range(0, Double.PositiveInfinity, ErrorMessage = "El precio tiene que ser positivo")]
     public decimal Price { get; set; }
 
     [NotMapped] public bool IsVegetarian => Type == ProductType.Vegetarian;
