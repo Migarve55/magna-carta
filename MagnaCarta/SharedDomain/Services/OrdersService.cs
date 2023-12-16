@@ -31,14 +31,16 @@ internal class OrdersService : IOrdersService
         return order;
     }
 
-    public async Task<IReadOnlyCollection<Order>> GetOrdersOrderedByDate(DateTime startDate, DateTime endDate)
+    public async Task<PaginatedResult<Order>> GetOrdersOrderedByDate(PaginationRequest paginationRequest, DateTime startDate, DateTime endDate)
     {
         var orders = await _repository.GetAllAsync();
-        return orders
+        var result = orders
             .Where(o => o.Date >= startDate && o.Date <= endDate)
             .OrderByDescending(o => o.Date)
             .ThenBy(o => o.Status)
             .ToList();
+
+        return PaginatedResult<Order>.ToPaginatedResult(result, paginationRequest.Page, paginationRequest.PerPage);
     }
 
     public async Task<IReadOnlyCollection<Order>> GetOrdersWithConfirmedDetails()

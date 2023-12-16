@@ -1,0 +1,38 @@
+﻿
+<nav>
+  <ul class="pagination justify-content-center">
+    <li class="@(Page <= 1 ? "page-item disabled" : "page-item")">
+      <button class="page-link" @onclick="@((() => ChangePage(Page - 1)))">
+        <span aria-hidden="true">&laquo;</span>
+      </button>
+    </li>
+    @for (int p = 1; p <= Pages; p++)
+    {
+      int pageNumber = p;
+      <li class="@(pageNumber == Page ? "page-item active" : "page-item")">
+        <button class="page-link" @onclick="@(() => ChangePage(pageNumber))">@p</button>
+      </li>
+    }
+    <li class="@(Page >= Pages ? "page-item disabled" : "page-item")">
+      <button class="page-link" @onclick="@((() => ChangePage(Page + 1)))">
+        <span aria-hidden="true">&raquo;</span>
+      </button>
+    </li>
+  </ul>
+</nav>
+
+@code {
+  [Parameter]
+  public int Page { get; set; } = 0;
+  
+  [Parameter]
+  public int Pages { get; set; } = 0;
+  
+  [Parameter] public Action<int> PageChanged { get; set; } = page => {}; 
+
+  private async Task ChangePage(int newPage)
+  {
+    Page = newPage;
+    PageChanged(newPage);
+  }
+}

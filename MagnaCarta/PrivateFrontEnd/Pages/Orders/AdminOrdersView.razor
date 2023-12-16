@@ -46,6 +46,7 @@ else
         }
         </tbody>
     </table>
+    <Pagination Page="_page" Pages="_pages" PageChanged="@(p => LoadDataAfterPageChange(p))"></Pagination>
 }
 
 @code {
@@ -53,10 +54,14 @@ else
     private DateTime? _beginDate;
     private DateTime? _endDate;
     private bool _invalidDates = false;
+
+    private int _page = 0;
+    private int _pages = 0;
     
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+        _page = Math.Min(1, _pages);
     }
 
     private async Task LoadData()
@@ -66,8 +71,17 @@ else
         _invalidDates = _beginDate > _endDate;
         if (!_invalidDates)
         {
-            _orders = await OrdersService.GetOrdersOrderedByDate(beginDate, endDate);
+            var paginationRequest = new PaginationRequest(_page);
+            var paginatedResult = await OrdersService.GetOrdersOrderedByDate(paginationRequest, beginDate, endDate);
+            _orders = paginatedResult.Result;
+            _pages = paginatedResult.Pages;
         }
         StateHasChanged();
+    }
+
+    private async Task LoadDataAfterPageChange(int newPage)
+    {
+        _page = newPage;
+        await LoadData();
     }
 }
