@@ -1,5 +1,14 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>MagnaCarta</PageTitle>
 
-<h1>MagnaCarta configurator</h1>
+<h1 class="mt-4 mb-2">MagnaCarta</h1>
+<AuthorizeView>
+    <Authorized>
+        <h2>Bienvenido @context.User.Identity?.Name</h2>
+    </Authorized>
+    <NotAuthorized>
+        <h2>No ha iniciado la sesión</h2>
+        <a class="btn btn-primary" href="Identity/Account/Login">Iniciar sesión</a>
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,6 +1,7 @@
 ﻿@page "/Orders/{OrderId:int}"
 @using SharedDomain.Entities
 @using SharedDomain.Services
+@attribute [Authorize(Roles = "admin")]
 <PageTitle>Detalle del pedido</PageTitle>
 @inject IOrdersService OrdersService
 <h1 class="mt-4">Detalle del pedido</h1>

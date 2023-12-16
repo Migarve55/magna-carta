@@ -1,4 +1,5 @@
 ﻿@page "/Products/New"
+@attribute [Authorize(Roles = "admin")]
 @using SharedDomain.Services
 @using SharedDomain.Entities
 <PageTitle>Crear producto</PageTitle>
