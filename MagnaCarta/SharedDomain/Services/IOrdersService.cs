@@ -6,7 +6,7 @@ public interface IOrdersService
 {
     Task<Order?> GetOrder(int id);
     Task<Order> GetOrCreateOrderForTable(Table table);
-    Task<IReadOnlyCollection<Order>> GetActiveOrdersOrderedByDate();
+    Task<IReadOnlyCollection<Order>> GetOrdersOrderedByDate(DateTime startDate, DateTime endDate);
     Task<IReadOnlyCollection<Order>> GetOrdersWithConfirmedDetails();
     Task<IReadOnlyCollection<Order>> GetOrdersWithReadyDetails();
     Task<Order> AddProductToTableOrder(Table table, Product product);

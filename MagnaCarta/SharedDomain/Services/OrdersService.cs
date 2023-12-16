@@ -31,12 +31,13 @@ internal class OrdersService : IOrdersService
         return order;
     }
 
-    public async Task<IReadOnlyCollection<Order>> GetActiveOrdersOrderedByDate()
+    public async Task<IReadOnlyCollection<Order>> GetOrdersOrderedByDate(DateTime startDate, DateTime endDate)
     {
         var orders = await _repository.GetAllAsync();
         return orders
-            .Where(o => o.IsActive())
+            .Where(o => o.Date >= startDate && o.Date <= endDate)
             .OrderByDescending(o => o.Date)
+            .ThenBy(o => o.Status)
             .ToList();
     }
 

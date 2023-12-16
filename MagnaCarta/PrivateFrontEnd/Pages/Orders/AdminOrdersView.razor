@@ -2,6 +2,13 @@
 @using SharedDomain.Services
 @inject IOrdersService OrdersService
 
+<div class="input-group mb-3">
+  <input type="date" class="@(_invalidDates ? "form-control is-invalid" : "form-control")" @bind="_beginDate">
+  <input type="date" class="form-control" @bind="_endDate">
+  <button class="btn btn-primary" type="button" id="button-addon2" @onclick="@LoadData">Buscar</button>
+  <div hidden="@(!_invalidDates)" class="invalid-feedback">La fecha inicial tiene que ser anterior que la final</div>
+</div>
+
 @if (_orders == null)
 {
     <p>
@@ -15,6 +22,7 @@ else
         <tr>
             <th>Mesa</th>
             <th>Fecha</th>
+            <th>Estado</th>
             <th></th>
         </tr>
         </thead>
@@ -24,6 +32,13 @@ else
             <tr>
                 <td>@order.Table.Name</td>
                 <td>@order.Date</td>
+                <td>
+                    @(order.Status switch
+                    {
+                        OrderStatus.Created => (@<span>Creado</span>),
+                        OrderStatus.Confirmed => (@<span>Confirmado</span>),
+                        OrderStatus.Closed => (@<span>Cerrado</span>)})
+                </td>
                 <td>
                     <a class="btn btn-primary" href="/Orders/@order.Id">Ver detalle</a>
                 </td>
@@ -35,6 +50,10 @@ else
 
 @code {
     private IReadOnlyCollection<Order>? _orders;
+    private DateTime? _beginDate;
+    private DateTime? _endDate;
+    private bool _invalidDates = false;
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -42,7 +61,13 @@ else
 
     private async Task LoadData()
     {
-        _orders = await OrdersService.GetActiveOrdersOrderedByDate();
+        var beginDate = _beginDate ?? DateTime.MinValue;
+        var endDate = _endDate ?? DateTime.MaxValue;
+        _invalidDates = _beginDate > _endDate;
+        if (!_invalidDates)
+        {
+            _orders = await OrdersService.GetOrdersOrderedByDate(beginDate, endDate);
+        }
         StateHasChanged();
     }
 }
