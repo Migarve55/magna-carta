@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using PrivateFrontEnd.Areas.Identity;
 using SharedDomain.Data;
 using SharedDomain.Extensions;
+using SharedDomain.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,12 @@ builder.Services
 builder.Services.AddServices();
 builder.Services.AddScoped<DataBaseSeeder>();
 builder.Services.AddLocalization();
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
+builder.Services.AddSignalRCore();
 
 var app = builder.Build();
 
@@ -54,5 +62,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+app.UseResponseCompression();
+app.MapHub<OrdersHub>("/ordershub");
 
 app.Run();

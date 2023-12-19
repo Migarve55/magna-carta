@@ -41,6 +41,7 @@ public class Order
             throw new InvalidOperationException();
         }
         Status = OrderStatus.Confirmed;
+        Date = DateTime.Now;
         OrderDetails.ForEach(d => d.ConfirmDetail());
     }
     

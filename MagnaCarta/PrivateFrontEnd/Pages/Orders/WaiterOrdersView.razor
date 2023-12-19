@@ -1,6 +1,9 @@
 ﻿@using SharedDomain.Entities
 @using SharedDomain.Services
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IAsyncDisposable
 @inject IOrdersService OrdersService
+@inject NavigationManager Navigation
 
 @if (_orders == null)
 {
@@ -13,31 +16,36 @@ else
     <div class="row row-cols-1 row-cols-md-2 g-4">
         @foreach (var order in _orders)
         {
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">@order.Table.Name</div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            @foreach (var detail in @order.ReadyDetails)
-                            {
-                                <li class="list-group-item d-flex justify-content-between align-items-start">
-                                    <span>@detail.Product.Name (@detail.Quantity)</span>
-                                    <button class="btn btn-primary" @onclick="@(() => MarkAsDelivered(detail))">Entregar</button>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                </div> 
-            </div>
+           @if (order.ReadyDetails.Any())
+           {
+               <div class="col">
+                   <div class="card">
+                       <div class="card-header">@order.Table.Name</div>
+                       <div class="card-body">
+                           <ul class="list-group list-group-flush">
+                               @foreach (var detail in @order.ReadyDetails)
+                               {
+                                   <li class="list-group-item d-flex justify-content-between align-items-start">
+                                       <span>@detail.Product.Name (@detail.Quantity)</span>
+                                       <button class="btn btn-primary" @onclick="@(() => MarkAsDelivered(detail))">Entregar</button>
+                                   </li>
+                               }
+                           </ul>
+                       </div>
+                   </div>
+               </div>
+           }
         }
     </div>
 }
 
 @code {
     private IReadOnlyCollection<Order>? _orders;
+    private HubConnection? _hubConnection;
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+        await SubscribeToOrderChange();
     }
 
     private async Task LoadData()
@@ -49,6 +57,34 @@ else
     private async Task MarkAsDelivered(SharedDomain.Entities.OrderDetail detail)
     {
         await OrdersService.MarkAsDelivered(detail);
-        await LoadData();
+    }
+
+    private async Task SubscribeToOrderChange()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/ordershub"))
+            .Build();
+
+        _hubConnection.On<int, int, OrderDetailStatus>("OrderDetailUpdated", (orderId, orderDetailId, newStatus) =>
+        {
+            var od = _orders
+                .Where(o => o.Id == orderId)
+                .SelectMany(o => o.ReadyDetails)
+                .FirstOrDefault(od => od.Id == orderDetailId);
+            if (od is not null)
+            {
+                od.Status = newStatus;
+                InvokeAsync(StateHasChanged);
+            }
+        });
+        await _hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
     }
 }

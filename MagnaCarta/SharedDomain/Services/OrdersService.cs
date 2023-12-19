@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using Microsoft.AspNetCore.SignalR;
 using SharedDomain.Entities;
+using SharedDomain.Hubs;
 using SharedDomain.Repositories;
 
 namespace SharedDomain.Services;
@@ -7,10 +9,12 @@ namespace SharedDomain.Services;
 internal class OrdersService : IOrdersService
 {
     private readonly IRepository<Order> _repository;
+    private IHubContext<OrdersHub> _context;
 
-    public OrdersService(IRepository<Order> repository)
+    public OrdersService(IRepository<Order> repository, IHubContext<OrdersHub> context)
     {
         _repository = repository;
+        _context = context;
     }
 
     public async Task<Order?> GetOrder(int id)
@@ -91,11 +95,18 @@ internal class OrdersService : IOrdersService
     {
         detail.MarkDetailAsReady();
         await _repository.UpdateAsync(detail.Order);
+        await NotifyOrderDetailUpdatedAsync(detail);
     }
 
     public async Task MarkAsDelivered(OrderDetail detail)
     {
         detail.MarkDetailAsDelivered();
         await _repository.UpdateAsync(detail.Order);
+        await NotifyOrderDetailUpdatedAsync(detail);
+    }
+
+    private async Task NotifyOrderDetailUpdatedAsync(OrderDetail orderDetail)
+    {
+        await _context.Clients.All.SendAsync("OrderDetailUpdated", orderDetail.OrderId, orderDetail.Id, orderDetail.Status);
     }
 }

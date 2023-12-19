@@ -14,6 +14,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddServices();
+builder.Services.AddSignalRCore();
 
 var app = builder.Build();
 

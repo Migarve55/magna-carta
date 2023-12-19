@@ -1,9 +1,12 @@
 ﻿@page "/Orders/{OrderId:int}"
 @using SharedDomain.Entities
 @using SharedDomain.Services
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IAsyncDisposable
 @attribute [Authorize(Roles = "admin")]
 <PageTitle>Detalle del pedido</PageTitle>
 @inject IOrdersService OrdersService
+@inject NavigationManager Navigation
 <h1 class="mt-4">Detalle del pedido</h1>
 <a href="Orders" class="btn btn-primary">Volver</a>
 
@@ -55,8 +58,42 @@ else
     
     private Order? _order { get; set; }
     
+    private HubConnection? _hubConnection;
+    
     protected override async Task OnInitializedAsync()
     {
+        await LoadData();
+        await SubscribeToOrderChange();
+    }
+
+    private async Task LoadData()
+    {
         _order = await OrdersService.GetOrder(OrderId);
+        StateHasChanged();
+    }
+
+    private async Task SubscribeToOrderChange()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/ordershub"))
+            .Build();
+
+        _hubConnection.On<int, int, OrderDetailStatus>("OrderDetailUpdated", (orderId, orderDetailId, newStatus) =>
+        {
+            if (orderId == _order!.Id)
+            {
+                _order!.OrderDetails.Single(od => od.Id == orderDetailId).Status = newStatus;
+                InvokeAsync(StateHasChanged);
+            }
+        });
+        await _hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
     }
 }
