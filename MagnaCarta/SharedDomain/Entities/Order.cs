@@ -31,8 +31,7 @@ public class Order
 
     public virtual List<OrderDetail> OrderDetails { get; set; } = new();
     [NotMapped] public decimal Total => OrderDetails.Sum(od => od.Total);
-    [NotMapped] public IReadOnlyCollection<OrderDetail> ConfirmedDetails => OrderDetails.Where(od => od.Status == OrderDetailStatus.Confirmed).ToList();
-    [NotMapped] public IReadOnlyCollection<OrderDetail> ReadyDetails => OrderDetails.Where(od => od.Status == OrderDetailStatus.Ready).ToList();
+    [NotMapped] public IReadOnlyCollection<OrderDetail> ConfirmedDetails => OrderDetails.Where(od => od.Status != OrderDetailStatus.Created).ToList();
 
     public void ConfirmOrder()
     {

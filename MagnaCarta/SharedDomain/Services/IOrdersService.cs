@@ -8,7 +8,6 @@ public interface IOrdersService
     Task<Order> GetOrCreateOrderForTable(Table table);
     Task<PaginatedResult<Order>> GetOrdersOrderedByDate(PaginationRequest paginationRequest, DateTime startDate, DateTime endDate);
     Task<IReadOnlyCollection<Order>> GetOrdersWithConfirmedDetails();
-    Task<IReadOnlyCollection<Order>> GetOrdersWithReadyDetails();
     Task<Order> AddProductToTableOrder(Table table, Product product);
     Task<Order> RemoveProductFromTableOrder(Table table, Product product);
     Task ConfirmOrder(Order order);

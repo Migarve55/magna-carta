@@ -23,8 +23,8 @@ else
         <tr>
             <th>Producto</th>
             <th>Cantidad</th>
-            <th>Estado</th>
             <th>Total</th>
+            <th>Estado</th>
         </tr>
         </thead>
         <tbody>
@@ -33,19 +33,19 @@ else
             <tr>
                 <td>@orderDetail.Product.Name</td>
                 <td>@orderDetail.Quantity</td>
+                <td>@orderDetail.Total</td>
                 <td>
                     @(orderDetail.Status switch
                     {
-                        OrderDetailStatus.Created => (@<span>Creado</span>),
-                        OrderDetailStatus.Confirmed => (@<span>Confirmado</span>),
-                        OrderDetailStatus.Ready => (@<span>Preparado</span>),
-                        OrderDetailStatus.Delivered => (@<span>Entregado</span>)})
+                        OrderDetailStatus.Created => (@<button class="btn btn-secondary" disabled="disabled">Creado</button>),
+                        OrderDetailStatus.Confirmed => (@<button @onclick="@(() => PrepareDetail(orderDetail))" class="btn btn-primary">Confirmado > Marcar preparado</button>),
+                        OrderDetailStatus.Ready => (@<button @onclick="@(() => DeliverDetail(orderDetail))" class="btn btn-primary">Preparado > Marcar entregado</button>),
+                        OrderDetailStatus.Delivered => (@<button class="btn btn-secondary" disabled="disabled">Entregado</button>)})
                 </td>
-                <td>@orderDetail.Total</td>
             </tr>
         }
         <tr>
-            <td colspan="3"></td>
+            <td colspan="2"></td>
             <td>@_order.Total</td>
         </tr>
         </tbody>
@@ -70,6 +70,16 @@ else
     {
         _order = await OrdersService.GetOrder(OrderId);
         StateHasChanged();
+    }
+
+    private async Task PrepareDetail(SharedDomain.Entities.OrderDetail detail)
+    {
+        await OrdersService.MarkAsReady(detail);
+    }
+    
+    private async Task DeliverDetail(SharedDomain.Entities.OrderDetail detail)
+    {
+        await OrdersService.MarkAsDelivered(detail);
     }
 
     private async Task SubscribeToOrderChange()

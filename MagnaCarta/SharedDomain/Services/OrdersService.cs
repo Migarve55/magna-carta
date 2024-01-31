@@ -55,14 +55,6 @@ internal class OrdersService : IOrdersService
             .ToList();
     }
 
-    public async Task<IReadOnlyCollection<Order>> GetOrdersWithReadyDetails()
-    {
-        var orders = await _repository.GetAllAsync();
-        return orders
-            .Where(o => o.ReadyDetails.Any())
-            .ToList();
-    }
-
     public async Task<Order> AddProductToTableOrder(Table table, Product product)
     {
         var order = await GetOrCreateOrderForTable(table);

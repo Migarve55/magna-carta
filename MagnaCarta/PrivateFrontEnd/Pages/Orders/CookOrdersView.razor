@@ -28,7 +28,12 @@ else
                                 {
                                     <li class="list-group-item d-flex justify-content-between align-items-start">
                                         <span>@detail.Product.Name (@detail.Quantity)</span>
-                                        <button class="btn btn-primary" @onclick="@(() => MarkAsReady(detail))">Preparado</button>
+                                        @(detail.Status switch
+                                        {
+                                            OrderDetailStatus.Created => (@<button class="btn btn-secondary" disabled="disabled">Creado</button>),
+                                            OrderDetailStatus.Confirmed => (@<button @onclick="@(() => MarkAsReady(detail))" class="btn btn-primary">Preparar</button>),
+                                            OrderDetailStatus.Ready => (@<button class="btn btn-secondary" disabled="disabled">Preparado</button>),
+                                            OrderDetailStatus.Delivered => (@<button class="btn btn-secondary" disabled="disabled">Entregado</button>)})
                                     </li>
                                 }
                             </ul>

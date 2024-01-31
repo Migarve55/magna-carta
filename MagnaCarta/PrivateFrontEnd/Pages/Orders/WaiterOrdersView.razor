@@ -16,18 +16,23 @@ else
     <div class="row row-cols-1 row-cols-md-2 g-4">
         @foreach (var order in _orders)
         {
-           @if (order.ReadyDetails.Any())
+           @if (order.ConfirmedDetails.Any())
            {
                <div class="col">
                    <div class="card">
                        <div class="card-header">@order.Table.Name</div>
                        <div class="card-body">
                            <ul class="list-group list-group-flush">
-                               @foreach (var detail in @order.ReadyDetails)
+                               @foreach (var detail in @order.ConfirmedDetails)
                                {
                                    <li class="list-group-item d-flex justify-content-between align-items-start">
                                        <span>@detail.Product.Name (@detail.Quantity)</span>
-                                       <button class="btn btn-primary" @onclick="@(() => MarkAsDelivered(detail))">Entregar</button>
+                                        @(detail.Status switch
+                                        {
+                                            OrderDetailStatus.Created => (@<button class="btn btn-secondary" disabled="disabled">Creado</button>),
+                                            OrderDetailStatus.Confirmed => (@<button class="btn btn-secondary" disabled="disabled">Confirmado</button>),
+                                            OrderDetailStatus.Ready => (@<button @onclick="@(() => MarkAsDelivered(detail))" class="btn btn-primary">Entregar</button>),
+                                            OrderDetailStatus.Delivered => (@<button class="btn btn-secondary" disabled="disabled">Entregado</button>)})
                                    </li>
                                }
                            </ul>
@@ -50,7 +55,7 @@ else
 
     private async Task LoadData()
     {
-        _orders = await OrdersService.GetOrdersWithReadyDetails();
+        _orders = await OrdersService.GetOrdersWithConfirmedDetails();
         StateHasChanged();
     }
 
@@ -69,7 +74,7 @@ else
         {
             var od = _orders
                 .Where(o => o.Id == orderId)
-                .SelectMany(o => o.ReadyDetails)
+                .SelectMany(o => o.ConfirmedDetails)
                 .FirstOrDefault(od => od.Id == orderDetailId);
             if (od is not null)
             {
