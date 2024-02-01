@@ -30,6 +30,12 @@ else
                     <span class="badge bg-success" hidden="@(!cartItem.Product.IsVegan)">Vegano</span>
                 </h5>
                 <p class="card-text text-secondary">@cartItem.Product.Description</p>
+                <p class="card-text">
+                    @foreach (var allergen in @cartItem.Product.Allergens)
+                    {
+                        <img class="symbol me-1 mb-1" alt="@allergen.Name" title="@allergen.Name" src="img/allergens/@allergen.Symbol"/>
+                    }
+                </p>
                 <div class="text-end">
                     <button class="btn btn-primary" onclick=@(() => AddToOrder(@cartItem.Product))>
                         <span class="oi oi-plus"></span>
@@ -93,7 +99,7 @@ else
     private async Task RemoveFromOrder(Product product)
     {
         _order = await OrdersService.RemoveProductFromTableOrder(_table!, product);
-        CreateCart();;
+        CreateCart();
     }
     
     private async Task ConfirmOrder()
