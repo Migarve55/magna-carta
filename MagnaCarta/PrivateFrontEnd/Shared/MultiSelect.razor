@@ -1,0 +1,36 @@
+﻿
+@inject IJSRuntime JS
+
+<select @ref="MultiSelectRef" @bind="Selected" class="form-select" data-placeholder="@(Placeholder)" multiple>
+    @foreach (var option in Options)
+    {
+        <option value="@option.Value">@option.Text</option>
+    }
+</select>
+
+@code {
+    ElementReference MultiSelectRef;
+    
+    [Parameter]
+    public MultiSelectOption[] Options { get; set; } = Array.Empty<MultiSelectOption>();
+    
+    [Parameter]
+    public int[] Selected { get; set; } = Array.Empty<int>();
+
+    [Parameter]
+    public string Placeholder { get; set; } = "";
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("setupMultiSelect", MultiSelectRef);
+        }
+    }
+
+    public async Task<int[]> GetSelectedValuesAsync()
+    {
+        var selectedValues = await JS.InvokeAsync<int[]>("getSelectedValues", MultiSelectRef);
+        return selectedValues;
+    }
+}
