@@ -29,4 +29,5 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
     public DbSet<Table> Tables { get; set; }
+    public DbSet<Allergen> Allergens { get; set; }
 }

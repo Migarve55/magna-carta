@@ -29,12 +29,16 @@ public class ProductsRepository : IRepository<Product>
 
     public async Task<IReadOnlyCollection<Product>> GetAllAsync()
     {
-        return await _dbContext.Products.ToArrayAsync();
+        return await _dbContext.Products
+            .Include(p => p.Allergens)
+            .ToArrayAsync();
     }
 
     public async Task<Product?> GetByIdAsync(int id)
     {
-        return await _dbContext.Products.SingleOrDefaultAsync(p => p.Id == id);
+        return await _dbContext.Products
+            .Include(p => p.Allergens)
+            .SingleOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task DeleteAsync(int id)

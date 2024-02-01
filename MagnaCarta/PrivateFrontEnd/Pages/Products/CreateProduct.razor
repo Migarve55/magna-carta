@@ -5,43 +5,40 @@
 <PageTitle>Crear producto</PageTitle>
 
 @inject IProductsService ProductsService
+@inject IAllergensService AllergensService
 @inject NavigationManager NavigationManager
 
 <h1 class="mt-4">Crear nuevo producto</h1>
 
-<EditForm Model="@Model" OnValidSubmit="@Submit">
+<EditForm class="col-md-6" Model="@Model" OnValidSubmit="@Submit">
     <DataAnnotationsValidator />
-    <div class="form-group row">
-        <label class="control-label col-md-12">Nombre</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="Model.Name" />
-        </div>
+    <div class="form-group">
+        <label class="control-label">Nombre</label>
+        <InputText class="form-control" @bind-Value="Model.Name" />
         <ValidationMessage For="@(() => Model!.Name)" />
     </div>
-    <div class="form-group row">
-        <label class="control-label col-md-12">Descripción</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="Model.Description" />
-        </div>
+    <div class="form-group">
+        <label class="control-label">Descripción</label>
+        <InputText class="form-control" @bind-Value="Model.Description" />
         <ValidationMessage For="@(() => Model!.Description)" />
     </div>
-    <div class="form-group row">
-        <label class="control-label col-md-12">Tipo</label>
-        <div class="col-md-4">
-            <InputSelect class="form-select" @bind-Value="Model.Type">
-                <option value="@(ProductType.Normal)">Normal</option>
-                <option value="@(ProductType.Vegetarian)">Vegetariano</option>
-                <option value="@(ProductType.Vegan)">Vegano</option>
-            </InputSelect>
-        </div>
+    <div class="form-group">
+        <label class="control-label">Tipo</label>
+        <InputSelect class="form-select" @bind-Value="Model.Type">
+            <option value="@(ProductType.Normal)">Normal</option>
+            <option value="@(ProductType.Vegetarian)">Vegetariano</option>
+            <option value="@(ProductType.Vegan)">Vegano</option>
+        </InputSelect>
         <ValidationMessage For="@(() => Model!.Type)" />
     </div>
-    <div class="form-group row">
-        <label class="control-label col-md-12">Precio</label>
-        <div class="col-md-4">
-            <InputNumber class="form-control" @bind-Value="Model.Price" />
-        </div>
+    <div class="form-group">
+        <label class="control-label">Precio</label>
+        <InputNumber class="form-control" @bind-Value="Model.Price" />
         <ValidationMessage For="@(() => Model!.Price)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Alergenos</label>
+        <MultiSelect @ref="MyMultiSelect" Options="AllergensOptions" Placeholder="Escoger alergenos"></MultiSelect>
     </div>
     <div class="form-group mt-2">
         <button type="submit" class="btn btn-primary">Crear</button>
@@ -51,11 +48,24 @@
 
 @code {
     public Product? Model { get; set; }
-    
-    protected override void OnInitialized() => Model ??= new();
+    public MultiSelectOption[] AllergensOptions { get; set; } = Array.Empty<MultiSelectOption>();
+
+    MultiSelect MyMultiSelect;
+    private IReadOnlyCollection<Allergen> _allergens;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model ??= new Product();
+        _allergens = await AllergensService.GetAllAllergens();
+        AllergensOptions = _allergens
+            .Select(a => new MultiSelectOption(a.Id, a.Name))
+            .ToArray();
+    }
 
     private async Task Submit()
     {
+        var selectedAllergensIds = await MyMultiSelect.GetSelectedValuesAsync();
+        Model!.Allergens = _allergens.Where(a => selectedAllergensIds.Contains(a.Id)).ToList();
         await ProductsService.AddProduct(Model!);
         NavigationManager.NavigateTo("/Products");
     }

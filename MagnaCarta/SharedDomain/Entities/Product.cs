@@ -23,6 +23,8 @@ public class Product
     [Range(0, Double.PositiveInfinity, ErrorMessage = "El precio tiene que ser positivo")]
     public decimal Price { get; set; }
 
+    public virtual List<Allergen> Allergens { get; set; } = new();
+
     [NotMapped] public bool IsVegetarian => Type == ProductType.Vegetarian;
     [NotMapped] public bool IsVegan => Type == ProductType.Vegan;
 }

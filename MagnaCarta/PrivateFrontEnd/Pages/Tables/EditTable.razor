@@ -9,13 +9,11 @@
 @inject NavigationManager NavigationManager
 <h1 class="mt-4">Editar mesa</h1>
 
-<EditForm Model="@Model" OnValidSubmit="@Submit">
+<EditForm class="col-md-6" Model="@Model" OnValidSubmit="@Submit">
     <DataAnnotationsValidator />
-    <div class="form-group row">
-        <label class="control-label col-md-12">Nombre</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="Model.Name" />
-        </div>
+    <div class="form-group">
+        <label class="control-label">Nombre</label>
+        <InputText class="form-control" @bind-Value="Model.Name" />
         <ValidationMessage For="@(() => Model!.Name)" />
     </div>
     <div class="form-group mt-2">
