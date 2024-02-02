@@ -35,8 +35,7 @@ else
                 <td>
                     @(order.Status switch
                     {
-                        OrderStatus.Created => (@<span>Creado</span>),
-                        OrderStatus.Confirmed => (@<span>Confirmado</span>),
+                        OrderStatus.Created => (@<span>Activo</span>),
                         OrderStatus.Closed => (@<span>Cerrado</span>)})
                 </td>
                 <td>

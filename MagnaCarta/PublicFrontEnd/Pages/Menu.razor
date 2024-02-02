@@ -19,15 +19,17 @@
 else
 {
     <h2>Menú - @_order?.Table.Name</h2>
-    <button class="btn btn-primary mb-3" @onclick="ConfirmOrder">Confirmar pedido</button>
+    <button class="btn btn-primary mb-3 me-2" disabled="@(!_order?.ConfirmedDetails.Any())" @onclick="ConfirmOrder">Ver pedido</button>
+    <button class="btn btn-primary mb-3" disabled="@(!_order?.PendingDetails.Any())" @onclick="ConfirmOrder">Confirmar carrito</button>
     @foreach (var cartItem in _cart!)
     {
         <div class="card shadow-sm mb-2">
             <div class="card-body">
-                <h5 class="card-title">
+                <h5 class="card-title d-flex">
                     <span class="me-2">@cartItem.Product.Name (@cartItem.Quantity)</span>
                     <span class="badge bg-success" hidden="@(!cartItem.Product.IsVegetarian)">Vegetariano</span>
                     <span class="badge bg-success" hidden="@(!cartItem.Product.IsVegan)">Vegano</span>
+                    <span class="ms-auto fw-bold">@cartItem.Product.Price.ToString("C")</span>
                 </h5>
                 <p class="card-text text-secondary">@cartItem.Product.Description</p>
                 <p class="card-text">
@@ -67,10 +69,6 @@ else
         }
         _products = await ProductsService.GetAllProducts();
         _order = await OrdersService.GetOrCreateOrderForTable(_table!);
-        if (_order.Status == OrderStatus.Confirmed)
-        {
-            NavigationManager.NavigateTo($"Orders/{_order!.Id}");
-        }
         CreateCart();
     }
 
@@ -79,7 +77,7 @@ else
         _cart = _products!
             .Select(p => new CartItem() { Product = p })
             .ToList();
-        _order!.OrderDetails?.ForEach(od =>
+        _order!.PendingDetails.ToList().ForEach(od =>
         {
             var cartItem = _cart.FirstOrDefault(c => c.Product.Id == od.Product.Id);
             if (cartItem != null)
@@ -104,7 +102,7 @@ else
     
     private async Task ConfirmOrder()
     {
-        await OrdersService.ConfirmOrder(_order!);
+        await OrdersService.ConfirmPendingDetails(_order!);
         NavigationManager.NavigateTo($"Orders/{_order!.Id}");
     }
 

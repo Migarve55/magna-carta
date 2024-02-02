@@ -34,12 +34,12 @@ else
                 <td>@orderDetail.Product.Name</td>
                 <td>@orderDetail.Product.Price</td>
                 <td>@orderDetail.Quantity</td>
-                <td>@orderDetail.Total</td>
+                <td>@orderDetail.Total.ToString("C")</td>
             </tr>
         }
         <tr>
             <td colspan="3"></td>
-            <td>@_order.Total</td>
+            <td>@_order.Total.ToString("C")</td>
         </tr>
         </tbody>
     </table>

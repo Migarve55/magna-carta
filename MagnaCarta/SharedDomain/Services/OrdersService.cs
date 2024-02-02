@@ -47,10 +47,12 @@ internal class OrdersService : IOrdersService
         return PaginatedResult<Order>.ToPaginatedResult(result, paginationRequest.Page, paginationRequest.PerPage);
     }
 
-    public async Task<IReadOnlyCollection<Order>> GetOrdersWithConfirmedDetails()
+    public async Task<IReadOnlyCollection<Order>> GetActiveOrdersForTodayWithConfirmedDetails()
     {
         var orders = await _repository.GetAllAsync();
         return orders
+            .Where(o => o.IsActive())
+            .Where(o => o.Date.Date == DateTime.Today)
             .Where(o => o.ConfirmedDetails.Any())
             .ToList();
     }
@@ -71,9 +73,9 @@ internal class OrdersService : IOrdersService
         return order;
     }
 
-    public async Task ConfirmOrder(Order order)
+    public async Task ConfirmPendingDetails(Order order)
     {
-        order.ConfirmOrder();
+        order.ConfirmPendingDetails();
         await _repository.UpdateAsync(order);
     }
 

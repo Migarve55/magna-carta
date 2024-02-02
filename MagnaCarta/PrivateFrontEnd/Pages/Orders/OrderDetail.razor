@@ -18,11 +18,17 @@
 }
 else
 {
+    <ul class="fw-bold my-2">
+        <li>Total: @_order!.Total.ToString("C")</li>
+        <li>Fecha: @_order.Date.ToShortDateString()</li>
+        <li>Mesa: @_order.Table.Name</li>
+    </ul>
     <table class="table">
         <thead>
         <tr>
             <th>Producto</th>
             <th>Cantidad</th>
+            <th>Hora</th>
             <th>Total</th>
             <th>Estado</th>
         </tr>
@@ -33,7 +39,8 @@ else
             <tr>
                 <td>@orderDetail.Product.Name</td>
                 <td>@orderDetail.Quantity</td>
-                <td>@orderDetail.Total</td>
+                <td>@orderDetail.CreationTime.ToShortTimeString()</td>
+                <td>@orderDetail.Total.ToString("C")</td>
                 <td>
                     @(orderDetail.Status switch
                     {
@@ -45,8 +52,8 @@ else
             </tr>
         }
         <tr>
-            <td colspan="2"></td>
-            <td>@_order.Total</td>
+            <td colspan="3"></td>
+            <td>@_order.Total.ToString("C")</td>
         </tr>
         </tbody>
     </table>
@@ -55,8 +62,8 @@ else
 @code {
     [Parameter]
     public int OrderId { get; set; }
-    
-    private Order? _order { get; set; }
+
+    private Order? _order; 
     
     private HubConnection? _hubConnection;
     

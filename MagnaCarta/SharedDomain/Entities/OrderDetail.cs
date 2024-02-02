@@ -17,6 +17,7 @@ public class OrderDetail
         ProductId = product.Id;
         Quantity = 1;
         Status = OrderDetailStatus.Created;
+        CreationTime = DateTime.Now;
     }
 
     [Key]
@@ -27,6 +28,9 @@ public class OrderDetail
     
     [Required]
     public OrderDetailStatus Status { get; set; }
+    
+    [Required]
+    public DateTime CreationTime { get; set; }
     
     public int ProductId { get; set; }
     public virtual Product Product { get; set; }

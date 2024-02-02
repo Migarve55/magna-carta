@@ -31,22 +31,22 @@ public class Order
 
     public virtual List<OrderDetail> OrderDetails { get; set; } = new();
     [NotMapped] public decimal Total => OrderDetails.Sum(od => od.Total);
+    [NotMapped] public IReadOnlyCollection<OrderDetail> PendingDetails => OrderDetails.Where(od => od.Status == OrderDetailStatus.Created).ToList();
     [NotMapped] public IReadOnlyCollection<OrderDetail> ConfirmedDetails => OrderDetails.Where(od => od.Status != OrderDetailStatus.Created).ToList();
 
-    public void ConfirmOrder()
+    public void ConfirmPendingDetails()
     {
         if (Status != OrderStatus.Created)
         {
             throw new InvalidOperationException();
         }
-        Status = OrderStatus.Confirmed;
         Date = DateTime.Now;
-        OrderDetails.ForEach(d => d.ConfirmDetail());
+        PendingDetails.ToList().ForEach(d => d.ConfirmDetail());
     }
     
     public void CloseOrder()
     {
-        if (Status != OrderStatus.Confirmed)
+        if (Status != OrderStatus.Created)
         {
             throw new InvalidOperationException();
         }
@@ -56,7 +56,7 @@ public class Order
     public void AddProduct(Product product)
     {
         CheckOrderIsEditable("No se puede editar un pedido cerrado");
-        var detail = GetOrderDetailByProduct(product);
+        var detail = GetPendingOrderDetailByProduct(product);
         if (detail == null)
         {
             detail = new OrderDetail(this, product);
@@ -71,7 +71,7 @@ public class Order
     public void RemoveProduct(Product product)
     {
         CheckOrderIsEditable("No se puede editar un pedido cerrado");
-        var detail = GetOrderDetailByProduct(product);
+        var detail = GetPendingOrderDetailByProduct(product);
         if (detail == null)
         {
             throw new InvalidOperationException($"No existe detalle para el producto ${product.Name}");
@@ -83,19 +83,19 @@ public class Order
         }
     }
 
-    private OrderDetail? GetOrderDetailByProduct(Product product)
+    private OrderDetail? GetPendingOrderDetailByProduct(Product product)
     {
-        return OrderDetails.FirstOrDefault(d => d.ProductId == product.Id);
+        return PendingDetails.FirstOrDefault(d => d.ProductId == product.Id);
     }
 
     public bool IsActive()
     {
-        return Status != OrderStatus.Closed;
+        return Status == OrderStatus.Created;
     }
 
     public bool IsEditable()
     {
-        return Status == OrderStatus.Created;
+        return IsActive();
     }
 
     private void CheckOrderIsEditable(string msg)
@@ -110,6 +110,5 @@ public class Order
 public enum OrderStatus
 {
     Created,
-    Confirmed,
     Closed
 }

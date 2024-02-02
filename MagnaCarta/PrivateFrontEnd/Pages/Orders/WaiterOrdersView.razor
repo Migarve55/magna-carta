@@ -26,7 +26,7 @@ else
                                @foreach (var detail in @order.ConfirmedDetails)
                                {
                                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                                       <span>@detail.Product.Name (@detail.Quantity)</span>
+                                       <span>@detail.Product.Name (@detail.Quantity) - @detail.CreationTime.ToShortTimeString()</span>
                                         @(detail.Status switch
                                         {
                                             OrderDetailStatus.Created => (@<button class="btn btn-secondary" disabled="disabled">Creado</button>),
@@ -55,7 +55,7 @@ else
 
     private async Task LoadData()
     {
-        _orders = await OrdersService.GetOrdersWithConfirmedDetails();
+        _orders = await OrdersService.GetActiveOrdersForTodayWithConfirmedDetails();
         StateHasChanged();
     }
 

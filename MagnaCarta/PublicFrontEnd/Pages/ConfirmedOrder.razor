@@ -9,7 +9,8 @@
 
 <h1>Pedido en curso</h1>
 
-<button class="btn btn-primary" @onclick="CloseOrder">Finalizar</button>
+<a class="btn btn-primary me-2" href="/Tables/@(_order?.TableId)">Seguir pidiendo</a>
+<button class="btn btn-primary" disabled="@(!_order?.OrderDetails.Any())" @onclick="CloseOrder">Finalizar pedido</button>
 
 @if (_order == null)
 {
@@ -19,11 +20,12 @@
 }
 else
 {
-    <ul class="list-group mt-2">
-        @foreach (var detail in _order.OrderDetails)
+    <span class="fw-bold mt-2 d-block">Total: @_order.Total.ToString("C")</span>
+    <ul class="list-group mt-1">
+        @foreach (var detail in _order.ConfirmedDetails)
         {
             <li class="list-group-item d-flex justify-content-between align-items-start">
-                <span>@detail.Product.Name (@detail.Quantity)</span>
+                <span>@detail.Product.Name (@detail.Quantity) - @detail.Total.ToString("C") a las @detail.CreationTime.ToShortTimeString()</span>
                 <div class="badge bg-primary rounded-pill">
                     @(detail.Status switch
                     {
