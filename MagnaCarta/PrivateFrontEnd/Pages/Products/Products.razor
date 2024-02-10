@@ -34,7 +34,7 @@ else
         {
             <tr>
                 <td>@product.Name</td>
-                <td>@product.Price</td>
+                <td>@product.Price.ToString("C")</td>
                 <td>
                     <a class="btn btn-primary" href="/Products/@product.Id">Editar</a>
                     <button class="btn btn-danger" onclick=@(() => Delete(@product.Id))>Borrar</button>

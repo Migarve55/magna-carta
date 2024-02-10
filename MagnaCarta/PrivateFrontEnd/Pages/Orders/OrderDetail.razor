@@ -8,7 +8,7 @@
 @inject IOrdersService OrdersService
 @inject NavigationManager Navigation
 <h1 class="mt-4">Detalle del pedido</h1>
-<a href="Orders" class="btn btn-primary">Volver</a>
+<a href="Orders" class="btn btn-primary me-2">Volver</a>
 
 @if (_order == null)
 {
@@ -18,10 +18,15 @@
 }
 else
 {
+    if (_order!.IsActive())
+    {
+        <button @onclick="CloseOrder" class="btn btn-danger">Cerrar pedido</button>
+    }
     <ul class="fw-bold my-2">
+        <li>Estado: @(_order!.IsActive() ? "Activo" : "Cerrado")</li>
         <li>Total: @_order!.Total.ToString("C")</li>
-        <li>Fecha: @_order.Date.ToShortDateString()</li>
-        <li>Mesa: @_order.Table.Name</li>
+        <li>Fecha: @_order!.Date.ToShortDateString()</li>
+        <li>Mesa: @_order!.Table.Name</li>
     </ul>
     <table class="table">
         <thead>
@@ -87,6 +92,12 @@ else
     private async Task DeliverDetail(SharedDomain.Entities.OrderDetail detail)
     {
         await OrdersService.MarkAsDelivered(detail);
+    }
+
+    private async Task CloseOrder()
+    {
+        await OrdersService.CloseOrder(_order!);
+        await LoadData();
     }
 
     private async Task SubscribeToOrderChange()
