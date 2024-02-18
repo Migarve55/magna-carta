@@ -16,6 +16,7 @@ public class OrderDetail
         Product = product;
         ProductId = product.Id;
         Quantity = 1;
+        Price = Product.Price;
         Status = OrderDetailStatus.Created;
         CreationTime = DateTime.Now;
     }
@@ -32,13 +33,16 @@ public class OrderDetail
     [Required]
     public DateTime CreationTime { get; set; }
     
+    [Required]
+    public decimal Price { get; set; }
+    
     public int ProductId { get; set; }
     public virtual Product Product { get; set; }
     
     public int OrderId { get; set; }
     public virtual Order Order { get; set; }
 
-    [NotMapped] public decimal Total => Product.Price * Quantity;
+    [NotMapped] public decimal Total => Price * Quantity;
 
     public void IncrementQuantity()
     {
